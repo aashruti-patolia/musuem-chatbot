@@ -5,19 +5,18 @@ import { useRouter } from 'next/navigation';
 
 function Page() {
     const [login, setLogin] = useState(true);
-    const [loginData, setLoginData] = useState({});
-    const [signUp, setSignUp] = useState({});
+    const [loginData, setLoginData] = useState({ username: "", password: "" });
+    const [signUpData, setSignUpData] = useState({ username: "", email: "", password: "", confirm: "" });
     const [errors, setErrors] = useState([]);
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-
-    useEffect(() => {
-        const fetchSession = async () => {
-            const session = await getSession();
-            console.log(session, "session");
-        };
-        fetchSession();
-    }, [username]);
+    const { data: session } = useSession();
+    console.log(session)
+    // useEffect(() => {
+    //     const fetchSession = async () => {
+    //         const session = await getSession();
+    //         console.log(session, "session data fetched on mount");
+    //     };
+    //     fetchSession();
+    // }, [loginData   ]);
 
     const validatePassword = (password) => {
         const errors = [];
@@ -31,37 +30,53 @@ function Page() {
 
     const handleForm = async (e) => {
         e.preventDefault();
-        const res = await signIn("credentials", {
-            username,
-            password,
-            redirect: false
-        });
-        console.log(res);
+        try {
+            const res = await signIn("credentials", {
+                username: loginData.username,
+                password: loginData.password,
+                redirect: false
+            });
+            if (res?.error) {
+                console.error(res.error, "sfsd");
+            } else {
+                console.log("User logged in successfully");
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+        }
     };
 
     const handleSignUp = async (e) => {
         e.preventDefault();
-        const validationErrors = validatePassword(signUp.password);
+        const validationErrors = validatePassword(signUpData.password);
         if (validationErrors.length === 0) {
-            const sendform = await fetch("http://localhost:5000/signup", {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                method: "POST",
-                body: JSON.stringify(signUp)
-            });
-            const data = await sendform.json();
-            console.log(data);
-            setSignUp({});
+            try {
+                const sendform = await fetch("http://localhost:5000/signup", {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: JSON.stringify(signUpData)
+                });
+                const data = await sendform.json();
+                console.log(data);
+                setSignUpData({ username: "", email: "", password: "", confirm: "" });
+            } catch (error) {
+                console.error("Sign-up error:", error);
+            }
         } else {
             setErrors(validationErrors);
-            console.log(validationErrors, "failed");
         }
     };
 
-    const handleChange = (e) => {
-        setSignUp(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleChange = (e, formType = "login") => {
+        const { name, value } = e.target;
+        if (formType === "login") {
+            setLoginData(prev => ({ ...prev, [name]: value }));
+        } else {
+            setSignUpData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     return (
@@ -76,8 +91,8 @@ function Page() {
                                 type="text"
                                 placeholder='username'
                                 name='username'
-                                value={loginData.username || ""}
-                                onChange={(e) => setLoginData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                                value={loginData.username}
+                                onChange={(e) => handleChange(e, "login")}
                             />
                         </div>
                         <div>
@@ -86,8 +101,8 @@ function Page() {
                                 type="password"
                                 placeholder='password'
                                 name='password'
-                                value={loginData.password || ""}
-                                onChange={(e) => setLoginData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                                value={loginData.password}
+                                onChange={(e) => handleChange(e, "login")}
                             />
                         </div>
                         <div className='button'>
@@ -116,8 +131,8 @@ function Page() {
                                 type="text"
                                 name='username'
                                 placeholder='username'
-                                value={signUp.username || ""}
-                                onChange={handleChange}
+                                value={signUpData.username}
+                                onChange={(e) => handleChange(e, "signup")}
                             />
                         </div>
                         <div>
@@ -126,8 +141,8 @@ function Page() {
                                 type="email"
                                 name='email'
                                 placeholder='email'
-                                value={signUp.email || ""}
-                                onChange={handleChange}
+                                value={signUpData.email}
+                                onChange={(e) => handleChange(e, "signup")}
                             />
                         </div>
                         <div>
@@ -136,8 +151,8 @@ function Page() {
                                 type="password"
                                 name='password'
                                 placeholder='password'
-                                value={signUp.password || ""}
-                                onChange={handleChange}
+                                value={signUpData.password}
+                                onChange={(e) => handleChange(e, "signup")}
                             />
                         </div>
                         {errors.length > 0 && (
@@ -155,8 +170,8 @@ function Page() {
                                 type="password"
                                 name='confirm'
                                 placeholder='confirm password'
-                                value={signUp.confirm || ""}
-                                onChange={handleChange}
+                                value={signUpData.confirm}
+                                onChange={(e) => handleChange(e, "signup")}
                             />
                         </div>
                         <div className='button'>

@@ -1,15 +1,19 @@
+// app/layout.js
 import localFont from "next/font/local";
 import "./globals.css";
+import AuthProvider from "./provider/AuthProvider"; // Import the client-side AuthProvider
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// Correctly configure custom fonts using relative paths from the public directory
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+  src: "/fonts/GeistVF.woff", // Use absolute path relative to the 'public' directory
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
+  src: "/fonts/GeistMonoVF.woff", // Use absolute path relative to the 'public' directory
   variable: "--font-geist-mono",
   weight: "100 900",
 });
@@ -22,12 +26,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navbar />
-        {children}
-        <Footer />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Use AuthProvider to wrap client-side logic */}
+        <AuthProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
