@@ -104,6 +104,7 @@ function Page() {
                                 value={loginData.password}
                                 onChange={(e) => handleChange(e, "login")}
                             />
+                            {session?.user?.name}
                         </div>
                         <div className='button'>
                             <button
@@ -115,7 +116,7 @@ function Page() {
                         </div>
                     </form>
                     <div>
-                        Don't have an account? <button className='text-blue-500' onClick={() => setLogin(false)}>Sign Up</button>
+                        Don't have an account?{session?.user?.email} <button className='text-blue-500' onClick={() => setLogin(false)}>Sign Up</button>
                     </div>
                     <div>
                         <button onClick={signOut}>logout</button>

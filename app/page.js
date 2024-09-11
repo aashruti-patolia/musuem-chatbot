@@ -3,8 +3,13 @@ import Image from "next/image"
 import ChatBot from "./components/ChatBot";
 import { useEffect } from "react";
 import ShowComponent from "./components/ShowComponent";
+import { getSession, useSession } from "next-auth/react";
+import { useState } from "react";
 
 export default function Home() {
+  const { data: session } = useSession();
+  const [session1, setsession1] = useState()
+  console.log(session)
   // useEffect(()=>{
   //   const login = async()=>{
   //     const res = await fetch("http://localhost:5000/login", {
@@ -21,6 +26,15 @@ export default function Home() {
   //   login()
   // },[])
 
+  useEffect(() => {
+    const sess = async () => {
+      const sessdata = await getSession()
+      setsession1(sessdata)
+    }
+    sess()
+  }, [session])
+  console.log(session1)
+
   return (
     <main className="py-10 px-40">
       <ChatBot />
@@ -30,14 +44,14 @@ export default function Home() {
           <p>Headout is an authorized and trusted partner of the venue, offering curated experiences to enjoy this attraction. This is not the venue's website.</p>
         </div>
         <div className="image w-1/2 rounded-2xl overflow-hidden">
-          <Image  className="h-full w-full object-cover" src={"/images/banner1.avif"}j width={1000} height={1000} alt="musuem image"/>
+          <Image className="h-full w-full object-cover" src={"/images/banner1.avif"} j width={1000} height={1000} alt="musuem image" />
         </div>
       </div>
-      
-      <ShowComponent image={"/images/museum.jpeg"}/>
-      <ShowComponent image={"/images/museum1.jpeg"}/>
-      <ShowComponent image={"/images/museum2.jpeg"}/>
-      <ShowComponent image={"/images/museum3.jpeg"}/>
+
+      <ShowComponent image={"/images/museum.jpeg"} />
+      <ShowComponent image={"/images/museum1.jpeg"} />
+      <ShowComponent image={"/images/museum2.jpeg"} />
+      <ShowComponent image={"/images/museum3.jpeg"} />
 
     </main>
   );
